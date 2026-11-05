@@ -1,20 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Configurações de Movimento")]
-    public float moveSpeed = 5.0f;
+    [SerializeField] private float moveSpeed = 5.0f;
+    [SerializeField] private float fixedYPosition = 1.0f; // Mantém flexível no Inspector
 
     private CharacterController controller;
 
-    void Start()
+    void Awake()
     {
         controller = GetComponent<CharacterController>();
-        if (controller == null)
-        {
-            controller = gameObject.AddComponent<CharacterController>();
-        }
     }
 
     void Update()
@@ -24,26 +22,25 @@ public class PlayerController : MonoBehaviour
         float x = 0f;
         float z = 0f;
 
-        // Leitura direta das teclas (Top-Down puro)
+        // Leitura direta do teclado (WASD + Setas)
         if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) z += 1f;
         if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) z -= 1f;
         if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) x += 1f;
         if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) x -= 1f;
 
-        // Vetor de movimento relativo à tela (X = Direita/Esquerda, Z = Cima/Baixo)
-        Vector3 move = new Vector3(x, 0f, z).normalized;
+        // Normalização do vetor (evita andar mais rápido na diagonal)
+        Vector3 moveInput = new Vector3(x, 0f, z).normalized;
 
-        if (move.magnitude >= 0.1f)
+        if (moveInput.sqrMagnitude > 0.01f)
         {
-            // Aplica o movimento travado no chão (sem alterar Y)
-            controller.Move(move * moveSpeed * Time.deltaTime);
+            controller.Move(moveInput * moveSpeed * Time.deltaTime);
         }
 
-        // Garante que o Player não suba/pule (trava o Y em relação ao chão)
-        Vector3 pos = transform.position;
-        if (pos.y != 1f) // Mantém a altura fixa do Player
+        // Correção de altura segura (apenas se houver desvio acidental de física)
+        if (!Mathf.Approximately(transform.position.y, fixedYPosition))
         {
-            transform.position = new Vector3(pos.x, 1f, pos.z);
+            Vector3 currentPos = transform.position;
+            transform.position = new Vector3(currentPos.x, fixedYPosition, currentPos.z);
         }
     }
 }
