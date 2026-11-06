@@ -6,9 +6,9 @@ public class SoundPulse : MonoBehaviour
 {
     [Header("Configurações de Luz")]
     public Light pulseLight;
-    public float maxRange = 5f;      // Alcance bem contido (igual ao Dia 1)
-    public float maxIntensity = 2f;  // Intensidade suave e sutil
-    public float pulseDuration = 2f; // Duração da expansão/recolhimento
+    public float maxRange = 5f;
+    public float maxIntensity = 2f;
+    public float pulseDuration = 2f;
 
     private bool isPulsing = false;
     private PulseCooldown cooldownScript;
@@ -38,6 +38,12 @@ public class SoundPulse : MonoBehaviour
 
             if (pulseLight != null)
             {
+                // --- CHAMADA DO ÁUDIO DO PULSO ---
+                if (AudioManager.instance != null)
+                {
+                    AudioManager.instance.PlayPulseSound();
+                }
+
                 StartCoroutine(EmitPulse());
 
                 if (cooldownScript != null)

@@ -4,12 +4,12 @@ public class GoalDetector : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        // Verifica se quem entrou na zona de saída é o Player
+        // Verifica se quem entrou na área de saída foi o jogador
         if (other.CompareTag("Player"))
         {
-            Debug.Log("🏆 Vitória! O jogador alcançou a saída.");
+            Debug.Log("🏆 Vitória! O jogador alcançou o objetivo.");
 
-            // Chama o gerenciador de UI para exibir a tela de vitória
+            // Procura o UIController na cena para exibir a tela de vitória
             UIController ui = FindObjectOfType<UIController>();
             if (ui != null)
             {

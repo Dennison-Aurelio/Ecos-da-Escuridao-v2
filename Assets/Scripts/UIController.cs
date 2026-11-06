@@ -13,11 +13,10 @@ public class UIController : MonoBehaviour
 
     void Start()
     {
-        // Garante que as telas começam ocultas
         if (victoryPanel != null) victoryPanel.SetActive(false);
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
 
-        Time.timeScale = 1f; // Garante que o jogo roda na velocidade normal
+        Time.timeScale = 1f;
     }
 
     public void UpdateCooldownBar(float currentCooldown, float maxCooldown)
@@ -34,7 +33,13 @@ public class UIController : MonoBehaviour
         if (victoryPanel != null)
         {
             victoryPanel.SetActive(true);
-            Time.timeScale = 0f; // Pausa a física/jogo
+            Time.timeScale = 0f;
+        }
+
+        // --- CHAMADA DO ÁUDIO DE VITÓRIA ---
+        if (AudioManager.instance != null)
+        {
+            AudioManager.instance.PlayVictorySound();
         }
     }
 
@@ -43,11 +48,16 @@ public class UIController : MonoBehaviour
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-            Time.timeScale = 0f; // Pausa a física/jogo
+            Time.timeScale = 0f;
+        }
+
+        // --- CHAMADA DO ÁUDIO DE GAME OVER ---
+        if (AudioManager.instance != null)
+        {
+            AudioManager.instance.PlayGameOverSound();
         }
     }
 
-    // Método chamado pelos botões da UI para reiniciar a partida
     public void RestartGame()
     {
         Time.timeScale = 1f;

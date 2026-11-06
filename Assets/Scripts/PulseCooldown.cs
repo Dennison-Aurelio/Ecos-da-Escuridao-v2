@@ -2,29 +2,57 @@ using UnityEngine;
 
 public class PulseCooldown : MonoBehaviour
 {
-    [Header("Configurações do Cooldown")]
-    public float cooldownTime = 3.0f; // Tempo total de espera em segundos
+    [Header("Configurações de Tempo")]
+    public float cooldownTime = 5.0f; // Tempo total de espera em segundos
+    private float currentCooldown = 0.0f;
 
-    private float nextPulseTime = 0.0f; // Momento (segundo exato) em que estará liberado
+    private UIController uiController;
 
-    // Checa se o pulso pode ser usado
-    public bool CanUsePulse()
+    void Start()
     {
-        return Time.time >= nextPulseTime;
+        // Encontra o UIController na cena
+        uiController = FindObjectOfType<UIController>();
+
+        // Garante que o pulso começa 100% pronto/carregado
+        currentCooldown = cooldownTime;
+        UpdateUI();
     }
 
-    // Reinicia o tempo de espera ao disparar o pulso
+    void Update()
+    {
+        // Se a recarga ainda não terminou, incrementa o tempo
+        if (currentCooldown < cooldownTime)
+        {
+            currentCooldown += Time.deltaTime;
+
+            if (currentCooldown > cooldownTime)
+            {
+                currentCooldown = cooldownTime;
+            }
+
+            UpdateUI();
+        }
+    }
+
+    // Chamado pelo SoundPulse ao apertar Espaço
     public void ResetCooldown()
     {
-        nextPulseTime = Time.time + cooldownTime;
+        currentCooldown = 0.0f;
+        UpdateUI();
     }
 
-    // Retorna a porcentagem de recarga de 0 a 1 (para atualizar a barra na UI)
-    public float GetCooldownProgress()
+    // Verifica se o pulso pode ser usado
+    public bool CanUsePulse()
     {
-        if (CanUsePulse()) return 1.0f; // Se já passou o tempo, a barra está 100% cheia
+        return currentCooldown >= cooldownTime;
+    }
 
-        float timeRemaining = nextPulseTime - Time.time;
-        return 1.0f - (timeRemaining / cooldownTime);
+    // Envia o valor atual para o Slider da UI
+    private void UpdateUI()
+    {
+        if (uiController != null)
+        {
+            uiController.UpdateCooldownBar(currentCooldown, cooldownTime);
+        }
     }
 }
